@@ -1,0 +1,23 @@
+{
+  "name": " ",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
+  },
+  "author": " ",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "cloudinary": "^1.8.0",
+    "cors": "^2.8.3",
+    "express": "^4.15.2",
+    "express-formidable": "^1.0.0",
+    "jwt-simple": "^0.5.1",
+    "method-override": "^2.3.8",
+    "moment": "^2.18.1",
+    "mongoose": "^4.9.5"
+  }
+}

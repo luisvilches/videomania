@@ -1,0 +1,96 @@
+const Model = require('.././models/family')
+const moment = require('moment');
+
+
+exports.find = (req,res) => {
+    Model.find((err,response) => {
+        if(err){ 
+            return res.status(500).json({
+                status:"error", 
+                message: `Error: ${err}` 
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success', 
+                total: response.length, 
+                data: response 
+            }
+        )}
+    })
+}
+
+
+exports.create = (req,res) => {
+
+    let data = new Model({
+        name: req.fields.name,
+        description: req.fields.description,
+        dateCreate: moment().format('DD-MM-YYYY'),
+        dateMod: moment().format('DD-MM-YYYY')
+    })
+
+    data.save((err,response) => {
+        if(err){
+            return res.status(500).json({
+                status:"error", 
+                message: `Error: ${err}` 
+            })
+        }
+        else{
+            return res.status(200).json({ 
+                status: "success", 
+                message: "registro creado con exito", 
+                data: response
+            })
+        }
+    })
+}
+
+exports.delete = (req,res) => {
+
+    let id = req.params.id;
+
+    Model.remove({_id: id},err => {
+      if(err){
+          return res.status(500).json({
+              status: 'error', 
+              message: `Error: ${err}` 
+            })
+        } 
+      else{ 
+          return res.status(200).json({
+              status:'success', 
+              message: `Registro ID: ${id} eliminado satisfactoriamente`
+            })
+        }
+   })
+}
+
+exports.update = (req,res) => {
+
+    let id = req.params.id;
+
+    let data = new Model({
+        _id: req.params.id,
+        name: req.fields.name,
+        description: req.fields.description,
+        dateMod: moment().format('DD-MM-YYYY')
+    });
+
+	Model.update({_id: id},data,(err,response) =>{
+		if(err){ 
+            return res.status(500).json({
+                status: 'error', 
+                message: `Error: ${err}` 
+            })
+        } 
+        else{ 
+            return res.status(200).json({
+                status:'success', 
+                message: `Registro ID: ${id} Actualizado satisfactoriamente`, 
+                data: response
+            })
+        }
+	})	
+}
