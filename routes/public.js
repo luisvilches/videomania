@@ -32,6 +32,15 @@ router.post('/gender', controller.gender.create)
 router.put('/gender/:id', controller.gender.update)
 router.delete('/gender/:id', controller.gender.delete)
 
+// productos
+
+router.get('/product', controller.product.find)
+router.post('/product', controller.product.create)
+router.put('/product/:id', controller.product.update)
+router.delete('/product/:id', controller.product.delete)
+
+
+
 
 
 module.exports = router;

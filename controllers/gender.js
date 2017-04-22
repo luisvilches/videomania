@@ -24,10 +24,10 @@ exports.find = (req,res) => {
 exports.create = (req,res) => {
 
     let data = new Model({
-        name: req.fields.name,
-        description: req.fields.description,
-        dateCreate: moment().format('DD-MM-YYYY'),
-        dateMod: moment().format('DD-MM-YYYY')
+        name: req.body.name,
+        description: req.body.description,
+        dateCreate: new Date(),
+        dateMod: new Date()
     })
 
     data.save((err,response) => {
@@ -51,7 +51,7 @@ exports.delete = (req,res) => {
 
     let id = req.params.id;
 
-    model.remove({_id: id},err => {
+    Model.remove({_id: id},err => {
       if(err){
           return res.status(500).json({
               status: 'error', 
@@ -73,12 +73,12 @@ exports.update = (req,res) => {
 
     let data = new Model({
         _id: req.params.id,
-        name: req.fields.name,
-        description: req.fields.description,
-        dateMod: moment().format('DD-MM-YYYY')
+        name: req.body.name,
+        description: req.body.description,
+        dateMod: new Date()
     });
 
-	model.update({_id: id},data,(err,response) =>{
+	Model.update({_id: id},data,(err,response) =>{
 		if(err){ 
             return res.status(500).json({
                 status: 'error', 

@@ -1,7 +1,6 @@
 'use strict'
 //modulos
 const frankify = require('./frankify')
-const formidable = require('formidable')
 const cloudinary = require('cloudinary')
 const routes = require('./routes/public')
 const routesPrivate = require('./routes/private')
@@ -9,7 +8,11 @@ const config = require('./config')
 
 
 // zona horaria
-process.env.TZ = 'UTC-4';
+//process.env.TZ = 'UTC-4';
+
+
+// use uploads
+//frankify.upload()
 
 // config cloudinary
 cloudinary.config({ 
@@ -19,11 +22,9 @@ cloudinary.config({
 });
 
 //config body-parser
-//frankify.bodyParserUrl({extended:false});
-//frankify.bodyParserJson();
+frankify.bodyParserUrl({extended:false});
+frankify.bodyParserJson();
 
-//config formidable
-frankify.formidable("/uploads");
 //config method-override
 frankify.methodOverride('_method')
 

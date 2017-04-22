@@ -8,7 +8,7 @@ const jwt = require('jwt-simple');
 const moment = require('moment');
 const auth = require('./middlewares/auth');
 const config = require('../config');
-const formidable = require('express-formidable');
+const fileUpload = require('express-fileupload');
 
 let app = express();
 
@@ -70,13 +70,8 @@ exports.staticFiles = (folder) => {
 }
 
 
-exports.formidable = (folder) => {
-    app.use(formidable({
-        encoding: 'utf-8',
-        uploadDir: folder,
-        keepExtensions: true,
-        multiples: true
-    }))
+exports.upload = () => {
+   app.use(fileUpload());
 }
 
 //////////////// functions to crud ////////////////////////////////////////////////

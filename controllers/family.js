@@ -24,8 +24,8 @@ exports.find = (req,res) => {
 exports.create = (req,res) => {
 
     let data = new Model({
-        name: req.fields.name,
-        description: req.fields.description,
+        name: req.body.name,
+        description: req.body.description,
         dateCreate: new Date(),
         dateMod: new Date()
     })
@@ -73,8 +73,8 @@ exports.update = (req,res) => {
 
     let data = new Model({
         _id: req.params.id,
-        name: req.fields.name,
-        description: req.fields.description,
+        name: req.body.name,
+        description: req.body.description,
         dateMod: new Date()
     });
 
