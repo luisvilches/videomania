@@ -26,8 +26,8 @@ exports.create = (req,res) => {
     let data = new Model({
         name: req.fields.name,
         description: req.fields.description,
-        dateCreate: moment().format('DD-MM-YYYY'),
-        dateMod: moment().format('DD-MM-YYYY')
+        dateCreate: new Date(),
+        dateMod: new Date()
     })
 
     data.save((err,response) => {
@@ -75,7 +75,7 @@ exports.update = (req,res) => {
         _id: req.params.id,
         name: req.fields.name,
         description: req.fields.description,
-        dateMod: moment().format('DD-MM-YYYY')
+        dateMod: new Date()
     });
 
 	Model.update({_id: id},data,(err,response) =>{
