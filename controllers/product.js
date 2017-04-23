@@ -1,8 +1,8 @@
-const express = require('express');
-const app = express();
-const fileUpload = require('express-fileupload');
+//const fileUpload = require('express-fileupload');
+const cloudinary = require('cloudinary')
 const Model = require('.././models/product');
-app.use(fileUpload())
+
+
 
 
 exports.find = (req,res) => {
@@ -26,40 +26,53 @@ exports.find = (req,res) => {
 
 exports.create = (req,res) => {
 
-    console.log(req.files)
+    let file = req.files.img;
+    let filename = req.files.img.name;
 
-    /*let data = new Model({
-        sku: req.body.sku,
-        category: req.body.category,
-        family: req.body.family,
-        gender: req.body.gender,
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        priceIva: req.body.price * 19 / 100,
-        premiere: req.body.premiere,
-        offer: req.body.offer,
-        image: req.files.image,
-        media: req.body.media,
-        dateCreate: new Date(),
-        dateMod: new Date()
+    file.mv(`./uploads/${filename}`, (err) => {
+        if(err) {
+            return res.status(500).json({status: 'error',message: err})
+        }
+        else {
+            cloudinary.uploader.upload(`./uploads/${filename}`, function(result) { 
+                let title = req.body.name;
+
+                 let data = new Model({
+                    sku: req.body.sku,
+                    category: req.body.category,
+                    family: req.body.family,
+                    gender: req.body.gender,
+                    name: req.body.name,
+                    nameUrl: title.replace(/ /g,"-").toLowerCase(),
+                    description: req.body.description,
+                    price: req.body.price,
+                    priceIva: req.body.price * 1.19,
+                    premiere: req.body.premiere,
+                    offer: req.body.offer,
+                    image: result.secure_url,
+                    media: req.body.media,
+                    dateCreate: new Date(),
+                    dateMod: new Date()
+                })
+
+                data.save((err,response) => {
+                    if(err){
+                        return res.status(500).json({
+                            status:"error", 
+                            message: `Error: ${err}` 
+                        })
+                    }
+                    else{
+                        return res.status(200).json({ 
+                            status: "success", 
+                            message: "registro creado con exito", 
+                            data: response
+                        })
+                    }
+                })
+            });
+        }
     })
-
-    data.save((err,response) => {
-        if(err){
-            return res.status(500).json({
-                status:"error", 
-                message: `Error: ${err}` 
-            })
-        }
-        else{
-            return res.status(200).json({ 
-                status: "success", 
-                message: "registro creado con exito", 
-                data: response
-            })
-        }
-    })*/
 }
 
 exports.delete = (req,res) => {

@@ -7,6 +7,7 @@ let Product = new Schema({
     family: String,
     gender: String,
     name: String,
+    nameUrl: String,
     description: String,
     price: String,
     priceIva: String,

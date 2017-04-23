@@ -12,7 +12,7 @@ const config = require('./config')
 
 
 // use uploads
-//frankify.upload()
+frankify.upload();
 
 // config cloudinary
 cloudinary.config({ 
