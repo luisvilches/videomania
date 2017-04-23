@@ -38,6 +38,7 @@ router.get('/product', controller.product.find)
 router.post('/product', controller.product.create)
 router.put('/product/:id', controller.product.update)
 router.delete('/product/:id', controller.product.delete)
+router.post('/product/gallery/:id', controller.product.addGallery)
 
 
 

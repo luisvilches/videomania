@@ -75,6 +75,46 @@ exports.create = (req,res) => {
     })
 }
 
+exports.addGallery = (req,res) => {
+
+    let file = req.files.image;
+    let filename = req.files.image.name;
+
+    file.mv(`./uploads/${filename}`, (err) => {
+        if(err) {
+            return res.status(500).json({status: 'error',message: err})
+        }
+        else {
+            cloudinary.uploader.upload(`./uploads/${filename}`, function(result) { 
+                let images = result.secure_url;
+
+                Model.findByIdAndUpdate(req.params.id,
+                    {$push: {"gallery": {img: images}}},
+                    {safe: true, upsert: true},
+                    function(err, model) {
+                        if(err) {
+                            return res.status(500).json({
+                                status:"error", 
+                                message: err
+                            })
+                        }
+                        else {
+                            return res.status(200).json({
+                                status: "success", 
+                                message: "imagen agregada con exito",
+                                data: model
+                            })
+                        }
+                    }
+                );
+
+            
+
+            });
+        }
+    })
+}
+
 exports.delete = (req,res) => {
 
     let id = req.params.id;

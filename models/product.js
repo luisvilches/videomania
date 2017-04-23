@@ -15,6 +15,9 @@ let Product = new Schema({
     offer: Boolean,
     image: String,
     media: String,
+    gallery: [
+        {img: String}
+    ],
     dateCreate: Date,
     dateMod: Date
 })
