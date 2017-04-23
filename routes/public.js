@@ -13,6 +13,7 @@ router.post('/authenticate', auth.auth)
 //categorias
 
 router.get('/category', controller.category.find)
+router.get('/category/:category', controller.product.findCategory)
 router.post('/category', controller.category.create)
 router.put('/category/:id', controller.category.update)
 router.delete('/category/:id', controller.category.delete)
@@ -35,10 +36,14 @@ router.delete('/gender/:id', controller.gender.delete)
 // productos
 
 router.get('/product', controller.product.find)
+router.get('/product/:name',controller.product.findName)
 router.post('/product', controller.product.create)
-router.put('/product/:id', controller.product.update)
-router.delete('/product/:id', controller.product.delete)
 router.post('/product/gallery/:id', controller.product.addGallery)
+router.put('/product/:id', controller.product.update)
+router.put('/product/image/:id', controller.product.updateImage)
+router.put('/product/premiere/:id', controller.product.premiere)
+router.put('/product/offer/:id', controller.product.offer)
+router.delete('/product/:id', controller.product.delete)
 
 
 

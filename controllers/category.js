@@ -26,6 +26,7 @@ exports.create = (req,res) => {
 
     let data = new Model({
         name: req.body.name,
+        url: req.body.name.replace(/ /g,"-").toLowerCase(),
         description: req.body.description,
         dateCreate: new Date(),
         dateMod: new Date()
