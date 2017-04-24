@@ -351,3 +351,56 @@ exports.findGender = (req,res) => {
     })
 }
 
+exports.premiere = (req,res) => {
+    Model.find({category: req.params.category,premiere: true},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    })
+}
+
+exports.offer = (req,res) => {
+    Model.find({category: req.params.category, offer:true},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    })
+}
+
+exports.family = (req,res) => {
+    Model.find({category: req.params.category, family:req.params.family},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    })
+}

@@ -13,7 +13,6 @@ router.post('/authenticate', auth.auth)
 //categorias
 
 router.get('/category', controller.category.find)
-router.get('/category/:category', controller.product.findCategory)
 router.post('/category', controller.category.create)
 router.put('/category/:id', controller.category.update)
 router.delete('/category/:id', controller.category.delete)
@@ -45,6 +44,22 @@ router.put('/product/premiere/:id', controller.product.premiere)
 router.put('/product/offer/:id', controller.product.offer)
 router.delete('/product/:id', controller.product.delete)
 
+
+// banner
+
+router.get('/banner', controller.banners.find)
+router.post('/banner', controller.banners.create)
+router.put('/banner/:id', controller.banners.update)
+router.delete('/banner/:id', controller.banners.delete)
+
+
+// rutas principales del front
+
+router.get('/category/:category', controller.product.findCategory)
+router.get('/category/:category/premiere', controller.product.premiere)
+router.get('/category/:category/offer', controller.product.offer)
+router.get('/category/:category/banner', controller.banners.findOne)
+router.get('/category/:category/:family', controller.product.family)
 
 
 

@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let Banners = new Schema({
-    name: String,
-    description: String,
+    category: String,
     img: String,
     dateCreate: Date,
     dateMod: Date

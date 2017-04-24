@@ -19,6 +19,24 @@ exports.find = (req,res) => {
     })
 }
 
+exports.findOne = (req,res) => {
+     Model.findOne({category: req.params.category},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    })
+}
+
 
 exports.create = (req,res) => {
 
@@ -34,8 +52,7 @@ exports.create = (req,res) => {
                 let title = req.body.name;
 
                  let data = new Model({
-                    name: req.body.name,
-                    description: req.ody.description,
+                    category: req.body.category,
                     img: result.secure_url,
                     dateCreate: new Date(),
                     dateMod: new Date()
@@ -83,35 +100,6 @@ exports.delete = (req,res) => {
 }
 
 exports.update = (req,res) => {
-
-    let id = req.params.id;
-    let title = req.body.name;
-
-    let data = new Model({
-        _id: req.params.id,
-        name: req.body.name,
-        description: req.ody.description,
-        dateMod: new Date()
-    });
-
-    Model.update({_id: id},data,(err,response) =>{
-        if(err){ 
-            return res.status(500).json({
-                status: 'error', 
-                message: `Error: ${err}` 
-            })
-        } 
-        else{ 
-            return res.status(200).json({
-                status:'success', 
-                message: `Registro ID: ${id} Actualizado satisfactoriamente`, 
-                data: response
-            })
-        }
-    })	
-}
-
-exports.updateImage = (req,res) => {
 
     let id = req.params.id;
     let file = req.files.img;
