@@ -404,3 +404,21 @@ exports.family = (req,res) => {
         }
     })
 }
+
+exports.oneProduct = (req,res) => {
+    Model.findOne({category: req.params.category, nameUrl:req.params.product},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    })
+}

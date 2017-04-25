@@ -60,6 +60,7 @@ router.get('/category/:category/premiere', controller.product.premiere)
 router.get('/category/:category/offer', controller.product.offer)
 router.get('/category/:category/banner', controller.banners.findOne)
 router.get('/category/:category/:family', controller.product.family)
+router.get('/products/:category/:product', controller.product.oneProduct)
 
 
 
