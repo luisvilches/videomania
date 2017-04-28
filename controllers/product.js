@@ -24,7 +24,7 @@ exports.find = (req,res) => {
 
 
 exports.create = (req,res) => {
-
+    let media = req.body.media.split('=');
     let file = req.files.img;
     let filename = req.files.img.name;
 
@@ -50,6 +50,8 @@ exports.create = (req,res) => {
                     offer: req.body.offer,
                     image: result.secure_url,
                     media: req.body.media,
+                    videoId: media[1],
+                    gallery: [],
                     dateCreate: new Date(),
                     dateMod: new Date()
                 })
@@ -85,12 +87,12 @@ exports.addGallery = (req,res) => {
         }
         else {
             cloudinary.uploader.upload(`./uploads/${filename}`, function(result) { 
-                let images = result.secure_url;
+                let imageGallery = result.secure_url;
 
                 Model.findByIdAndUpdate(req.params.id,
-                    {$push: {"gallery": {img: images}}},
+                    {$push: {"gallery": {original: imageGallery,thumbnail: imageGallery ,size: 300}}},
                     {safe: true, upsert: true},
-                    function(err, model) {
+                    function(err, response) {
                         if(err) {
                             return res.status(500).json({
                                 status:"error", 
@@ -101,14 +103,11 @@ exports.addGallery = (req,res) => {
                             return res.status(200).json({
                                 status: "success", 
                                 message: "imagen agregada con exito",
-                                data: model
+                                data: response
                             })
                         }
                     }
                 );
-
-            
-
             });
         }
     })
@@ -147,6 +146,7 @@ exports.update = (req,res) => {
         gender: req.body.gender,
         name: req.body.name,
         nameUrl: title.replace(/ /g,"-").toLowerCase(),
+        pie: req.body.pie,
         description: req.body.description,
         price: req.body.price,
         priceIva: req.body.price * 1.19,
@@ -368,6 +368,23 @@ exports.premiere = (req,res) => {
         }
     })
 }
+exports.premiereall = (req,res) => {
+    Model.find({premiere: true},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    }).sort({'date': -1}).limit(4)
+}
 
 exports.offer = (req,res) => {
     Model.find({category: req.params.category, offer:true},(err,response) => {
@@ -385,6 +402,23 @@ exports.offer = (req,res) => {
             })
         }
     })
+}
+exports.offerall = (req,res) => {
+    Model.find({offer:true},(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: response
+            })
+        }
+    }).sort({'date': -1}).limit(4)
 }
 
 exports.family = (req,res) => {

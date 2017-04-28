@@ -8,6 +8,7 @@ let Product = new Schema({
     gender: String,
     name: String,
     nameUrl: String,
+    pie: String,
     description: String,
     price: String,
     priceIva: String,
@@ -15,8 +16,13 @@ let Product = new Schema({
     offer: Boolean,
     image: String,
     media: String,
+    videoId: String,
     gallery: [
-        {img: String}
+        {
+            original: String,
+            thumbnail:String,
+            size: Number
+        }
     ],
     dateCreate: Date,
     dateMod: Date
