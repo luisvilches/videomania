@@ -53,6 +53,13 @@ router.put('/banner/:id', controller.banners.update)
 router.delete('/banner/:id', controller.banners.delete)
 
 
+// advertising
+
+router.get('/advertising', controller.bannersPublicidad.find)
+router.post('/advertising', controller.bannersPublicidad.create)
+router.put('/advertising/:id', controller.bannersPublicidad.update)
+router.delete('/advertising/:id', controller.bannersPublicidad.delete)
+
 // rutas principales del front
 
 router.get('/category/:category', controller.product.findCategory)
@@ -61,6 +68,7 @@ router.get('/category/:category/offer', controller.product.offer)
 router.get('/category/:category/banner', controller.banners.findOne)
 router.get('/category/:category/:family', controller.product.family)
 router.get('/products/:category/:product', controller.product.oneProduct)
+router.get('/search/:name', controller.product.search)
 
 
 

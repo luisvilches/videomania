@@ -422,3 +422,38 @@ exports.oneProduct = (req,res) => {
         }
     })
 }
+
+exports.search = (req,res) => {
+    Model.find({ name: { 
+            $regex: req.params.name.toUpperCase(),
+            $regex: req.params.name.toLowerCase(),
+            $regex: req.params.name.replace(/\b\w/g, function(l){ return l.toUpperCase() })
+        } },(err,response) => {
+        if(err) {
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else{
+            console.log(response)
+            if(response == ''){
+                return res.status(200).json({
+                    status: 'success',
+                    index: 0,
+                    message: 'Registos encontrados con exito',
+                    count: response.length,
+                    data: [{name: 'Productos no encontrados'}]
+                })
+            }else{
+                return res.status(200).json({
+                    status: 'success',
+                    index: 1,
+                    message: 'Registos encontrados con exito',
+                    count: response.length,
+                    data: response
+                })
+            }
+        }
+    })
+}
