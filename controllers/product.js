@@ -4,6 +4,7 @@ const Model = require('.././models/product');
 
 
 
+
 exports.find = (req,res) => {
     Model.find((err,response) => {
         if(err){ 
@@ -383,7 +384,7 @@ exports.premiereall = (req,res) => {
                 data: response
             })
         }
-    }).sort({'date': -1}).limit(4)
+    }).sort({'date': -1}).limit(8)
 }
 
 exports.offer = (req,res) => {
@@ -418,7 +419,7 @@ exports.offerall = (req,res) => {
                 data: response
             })
         }
-    }).sort({'date': -1}).limit(4)
+    }).sort({'date': -1}).limit(8)
 }
 
 exports.family = (req,res) => {

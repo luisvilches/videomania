@@ -136,3 +136,23 @@ exports.update = (req,res) => {
         }
     })
 }
+
+
+
+exports.bannersHome = (req,res) => {
+    Model.findRandom({}, {}, {count: 2}, function(err, results) {
+        if (err){
+            return res.status(500).json({
+                status: 'error',
+                message: err
+            })
+        }
+        else {
+            return res.status(200).json({
+                status: 'success',
+                message: 'Registos encontrados con exito',
+                data: results
+            })
+        }
+    })
+}

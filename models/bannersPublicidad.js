@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const random = require('mongoose-simple-random');
 const Schema = mongoose.Schema;
 
 let BannersPublicidad = new Schema({
@@ -8,5 +9,7 @@ let BannersPublicidad = new Schema({
     dateCreate: Date,
     dateMod: Date
 })
+
+BannersPublicidad.plugin(random);
 
 module.exports = mongoose.model('BannersPublicidad', BannersPublicidad);
