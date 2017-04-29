@@ -6,7 +6,7 @@ const controller = require('.././controllers');
 /////////////// Routes privates /////////////////////////////
 
 router.get('/users', controller.users.users)
-router.post('/create', controller.users.createuser)
+//router.post('/create', controller.users.createuser)
 router.get('/user/:id', controller.users.userid)
 router.post('/user/findone', controller.users.one)
 router.delete('/user/:id', controller.users.delete)

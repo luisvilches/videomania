@@ -7,7 +7,7 @@ const auth = require('../frankify/controllers/auth')
 /////////////// Routes  /////////////////////////////
 
 router.get('/', controller.main.index)
-router.post('/authenticate', auth.auth)
+router.post('/login', auth.auth)
 
 
 //categorias
@@ -84,6 +84,9 @@ router.get('/products/:category/:product', controller.product.oneProduct)
 router.get('/search/:name', controller.product.search)
 
 
+//users
 
+router.get('/users', controller.users.users)
+router.post('/users/create', controller.users.createuser)
 
 module.exports = router;
