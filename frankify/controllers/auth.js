@@ -21,7 +21,8 @@ exports.auth =  (req, res) => {
             res.json({
                 success: true,
                 message: 'Enjoy your token!',
-                token: sys.createTokens(user)
+                token: sys.createTokens(user),
+                user: user
             });
         }
     }
