@@ -84,6 +84,11 @@ router.get('/products/:category/:product', controller.product.oneProduct)
 router.get('/search/:name', controller.product.search)
 
 
+router.post('/user/cart/:id', controller.users.addToCart)
+router.delete('/user/cart/:id', controller.users.deleteToCart)
+router.get('/user/cart/total/:id', controller.users.totalCard)
+
+
 //users
 
 router.get('/users', controller.users.users)

@@ -18,6 +18,21 @@ let User = new Schema({
 			price: Number
 		}
 	],
+	my_shopping:[
+		{
+			transaction: String,
+			items: [
+				{
+					cant: Number,
+					sku: String,
+					item: String,
+					price: Number
+				}
+			],
+			total: Number,
+			Date: Date
+		}
+	],
 	date: Date
 })
 
