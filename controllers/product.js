@@ -2,7 +2,24 @@ const cloudinary = require('cloudinary')
 const Model = require('.././models/product');
 
 
-
+function format(valor){
+	if(valor === null){
+		valor = 0;
+		return valor;
+	}
+	else {
+		var num = valor.toString().replace(/\./g,'');
+		if(!isNaN(num)){
+			num = num.toString().split('').reverse().join('').replace(/(?=\d*\.?)(\d{3})/g,'$1.');
+			num = num.split('').reverse().join('').replace(/^[\.]/,'');
+			valor = num;
+			return valor
+		} else { 
+			console.log('Solo se permiten numeros');
+			valor = valor.replace(/[^\d\.]*/g,'');
+		}
+	}
+}
 
 
 exports.find = (req,res) => {
@@ -17,7 +34,8 @@ exports.find = (req,res) => {
             return res.status(200).json({
                 status: 'success', 
                 total: response.length, 
-                data: response 
+                data: response,
+                price: format(response.price)
             }
         )}
     })
@@ -52,7 +70,13 @@ exports.create = (req,res) => {
                     image: result.secure_url,
                     media: req.body.media,
                     videoId: media[1],
-                    gallery: [],
+                    gallery: [
+                        {
+                            original: result.secure_url,
+                            thumbnail: result.secure_url,
+                            size: 300
+                        }
+                    ],
                     dateCreate: new Date(),
                     dateMod: new Date()
                 })
@@ -452,7 +476,8 @@ exports.oneProduct = (req,res) => {
             return res.status(200).json({
                 status: 'success',
                 message: 'Registos encontrados con exito',
-                data: response
+                data: response,
+                price: format(response.price)
             })
         }
     })
