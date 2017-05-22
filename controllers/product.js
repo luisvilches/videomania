@@ -35,7 +35,7 @@ exports.find = (req,res) => {
                 status: 'success', 
                 total: response.length, 
                 data: response,
-                price: format(response.price)
+                //price: format(response.price)
             }
         )}
     })

@@ -48,6 +48,7 @@ router.delete('/product/:id', controller.product.delete)
 // banner
 
 router.get('/banner', controller.banners.find)
+router.get('/banner/category/:category', controller.banners.findCategory)
 router.post('/banner', controller.banners.create)
 router.put('/banner/:id', controller.banners.update)
 router.delete('/banner/:id', controller.banners.delete)

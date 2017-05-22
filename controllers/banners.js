@@ -20,6 +20,24 @@ exports.find = (req,res) => {
     })
 }
 
+exports.findCategory = (req,res) => {
+    Model.find({category: req.params.category},(err,response) => {
+        if(err){ 
+            return res.status(500).json({
+                status:"error", 
+                message: `Error: ${err}` 
+            })
+        }
+        else{
+            return res.status(200).json({
+                status: 'success', 
+                total: response.length, 
+                data: response 
+            }
+        )}
+    })
+}
+
 exports.findOne = (req,res) => {
      Model.findOne({category: req.params.category},(err,response) => {
         if(err) {
