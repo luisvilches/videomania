@@ -38,6 +38,7 @@ router.get('/product', controller.product.find)
 router.get('/product/:name',controller.product.findName)
 router.post('/product', controller.product.create)
 router.post('/product/gallery/:id', controller.product.addGallery)
+router.delete('/product/gallery/one/:id', controller.product.deleteGallery)
 router.put('/product/:id', controller.product.update)
 router.put('/product/image/:id', controller.product.updateImage)
 router.put('/product/premiere/:id', controller.product.premiere)
@@ -94,5 +95,10 @@ router.get('/user/cart/total/:id', controller.users.totalCard)
 
 router.get('/users', controller.users.users)
 router.post('/users/create', controller.users.createuser)
+
+router.get('/user/:id', controller.users.userid)
+router.post('/user/findone', controller.users.one)
+router.delete('/user/:id', controller.users.delete)
+router.put('/user/update/:id',controller.users.update)
 
 module.exports = router;

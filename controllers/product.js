@@ -138,6 +138,27 @@ exports.addGallery = (req,res) => {
     })
 }
 
+exports.deleteGallery = (req,res) =>{
+	let id = req.params.id
+	Model.findOne({'gallery._id': id}, function (err, result) {
+        result.gallery.id(id).remove();
+        result.save((err) => {
+			if(err) {
+				return res.status(500).json({
+					status:"error", 
+					message: err
+				})
+			}
+			else {
+				return res.status(200).json({
+					status: "success", 
+					message: "elimiado con exito"
+				})
+			}
+		});            
+    });
+}
+
 exports.delete = (req,res) => {
 
     let id = req.params.id;
