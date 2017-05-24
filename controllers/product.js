@@ -498,7 +498,7 @@ exports.oneProduct = (req,res) => {
                 status: 'success',
                 message: 'Registos encontrados con exito',
                 data: response,
-                price: format(response.price)
+                //price: format(response.price)
             })
         }
     })

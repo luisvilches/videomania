@@ -1,4 +1,5 @@
 const frankify = require('../frankify')
+const NodeMailer = require('nodemailer');
 const User = require('.././models/user')
 
 // Function to show all Users
@@ -137,4 +138,113 @@ function format(valor){
 			valor = valor.replace(/[^\d\.]*/g,'');
 		}
 	}
+}
+
+exports.userRegister = (req,res) => {
+	User.findOne({rut: req.body.rut},(err,response) => {
+		if(response == null) {
+			if(err) {
+			res.status(500).json({message: 'el rut ingresado ya existe en nuestros registros este es un error', error: err})
+			}else{
+				let usuario = new User({
+					rut: req.body.rut,
+					name: req.body.name,
+					apellido: req.body.apellido,
+					mail: req.body.mail,
+					phone: req.body.phone,
+					username: req.body.username,
+					password:req.body.password,
+					admin: req.body.admin,
+					date: new Date()
+				})
+
+				usuario.save((err, response) => {
+					if(err){
+						res.status(500).json({
+							message:'Error al crear el usuario, intentelo mas tarde',
+							error: err,
+							status: 'error'
+						})
+					}else{
+						res.status(200).json({
+							message:'Registro creado con exito',
+							status: 'success',
+							data: response
+						})
+					}
+				})
+			}
+		}else {
+			res.status(500).json({message: 'el rut ingresado ya existe en nuestros registros'})
+		}
+	})
+}
+
+
+exports.recover = (req,res) => {
+	User.findOne({mail: req.body.mail},(err,response) => {
+		if(response === null){
+			res.status(500).json({status:'error',message: 'El usuario no existe'})
+		}else{
+			let template = `	<section>
+									<br><h3>Mensaje de recuperacion de password</h3><br>
+									<hr>
+									<br>
+									<h4> Estimado usuario ${response.name} ${response.apellido}</h4>
+									<p>sus datos de acceso para ingresar a nuestro sitio son:</p>
+									<br>
+									<br>
+									<h2>Correo: <b>${response.mail}</b></h2>
+									<h2>Password: <b>${response.password}</b></h2>
+									<br>
+									<br>
+									<br>
+									<h3><b>Atte.</b></h3>
+									<h3><b>El equipo de Videomanias.cl</b></h3>
+								</section>
+							`
+
+
+			let mailOptions = {
+				from: 'Videomanias.cl',
+				to: response.mail,
+				subject: 'recuperacion de password Videomanias.cl',
+				html: template
+			};
+
+			let smtpConfig = {
+				host: 'mail.dowhile.cl',
+				port: 587,
+				tls: {
+					rejectUnauthorized:false
+				},
+				secure: false, // upgrade later with STARTTLS
+				auth: {
+					user: 'info@dowhile.cl',
+					pass: 'd0wh1l3' 
+				}
+			};
+
+			let transporter = NodeMailer.createTransport(smtpConfig);
+
+			transporter.sendMail(mailOptions, function(error, info){
+			if (error){
+				console.log(error);
+				res.status(200).json({
+					status:'error',
+					message: 'error al enviar la contraseña',
+					data: error
+				});
+			} else {
+				console.log("Email sent");
+				res.status(200).json({
+					status:'success',
+					message: 'Clave envia a su correo electronico',
+					data: info
+				});
+			}
+		});
+		}
+			
+	})
 }

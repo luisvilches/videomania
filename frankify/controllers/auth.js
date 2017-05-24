@@ -4,7 +4,7 @@ const User = require('../../models/user')
 
 exports.auth =  (req, res) => {
  //find the user
- User.findOne({name: req.body.name},(err, user) => {
+ User.findOne({mail: req.body.mail},(err, user) => {
     if (err) throw err;
 
     if (!user) {

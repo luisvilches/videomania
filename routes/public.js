@@ -95,7 +95,8 @@ router.get('/user/cart/total/:id', controller.users.totalCard)
 
 router.get('/users', controller.users.users)
 router.post('/users/create', controller.users.createuser)
-
+router.post('/register',controller.users.userRegister)
+router.post('/recover',controller.users.recover)
 router.get('/user/:id', controller.users.userid)
 router.post('/user/findone', controller.users.one)
 router.delete('/user/:id', controller.users.delete)
