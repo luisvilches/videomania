@@ -429,7 +429,7 @@ exports.premiereall = (req,res) => {
                 data: response
             })
         }
-    }).sort({'date': -1}).limit(8)
+    }).sort({'date': -1}).limit(6)
 }
 
 exports.offer = (req,res) => {
@@ -464,7 +464,7 @@ exports.offerall = (req,res) => {
                 data: response
             })
         }
-    }).sort({'date': -1}).limit(8)
+    }).sort({'date': -1}).limit(6)
 }
 
 exports.family = (req,res) => {
