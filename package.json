@@ -13,6 +13,7 @@
     "body-parser": "^1.17.1",
     "cloudinary": "^1.8.0",
     "cors": "^2.8.3",
+    "decimal.js-light": "^2.2.3",
     "express": "^4.15.2",
     "express-fileupload": "^0.1.2",
     "jwt-simple": "^0.5.1",
@@ -20,6 +21,7 @@
     "moment": "^2.18.1",
     "mongoose": "^4.9.5",
     "mongoose-simple-random": "^0.4.1",
-    "nodemailer": "^4.0.1"
+    "nodemailer": "^4.0.1",
+    "webpay-nodejs": "^0.1.6"
   }
 }

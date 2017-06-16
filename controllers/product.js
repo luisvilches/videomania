@@ -1,5 +1,21 @@
 const cloudinary = require('cloudinary')
 const Model = require('.././models/product');
+const WebPay = require('webpay-nodejs');
+const fs = require('fs');
+const path = require('path');
+const public = require('.././keys/public');
+const private = require('.././keys/private');
+const webpaykey = require('.././keys/webpaykey');
+
+const wp = new WebPay({
+    commerceCode: '597020000541',
+    publicKey: public,
+    privateKey: private,
+    webpayKey: webpaykey
+});
+
+var transactions = {};
+
 
 
 function format(valor){
@@ -537,4 +553,52 @@ exports.search = (req,res) => {
             }
         }
     })
+}
+
+exports.transaccion = (req,res) => {
+
+    let buyOrden = Date.now();
+    let amount = req.body.amount;
+    transactions[buyOrden] = { amount: amount};
+    let url = 'http://' + req.get('host');
+
+    wp.initTransaction({
+        buyOrder: buyOrden,
+        sessionId: req.sessionId,
+        returnURL: url + '/verificar',
+        finalURL: url + '/comprobante',
+        amount: amount
+    }).then((data) => {
+        //res.redirect(data.url + '?token_ws=' + data.token);
+        res.status(200).json({url: data.url + '?token_ws=' + data.token})
+        console.log(data.url + '?token_ws=' + data.token)
+    })
+}
+
+exports.verificar = (req,res) => {
+    let token = req.body.token_ws;
+    let transaction;
+
+    console.log('pre token', token);
+
+    wp.getTransactionResult(token).then((transactionResult) => {
+        transaction = transactionResult;
+       transactions[transaction.buyOrder] = transaction;
+
+        console.log('transaction', transaction);
+       
+        console.log('re acknowledgeTransaction', token)
+       return wp.acknowledgeTransaction(token);
+
+    }).then((result2) => {
+        console.log('pos acknowledgeTransaction', result2);
+        // Si llegas aquí, entonces la transacción fue confirmada.
+        // Este es un buen momento para guardar la información y actualizar tus registros (disminuir stock, etc).
+
+        res.send(WebPay.getHtmlTransitionPage(transaction.urlRedirection, token));
+    });
+}
+
+exports.comprobante = (req,res) => {
+    res.redirect('http://localhost:3000')
 }

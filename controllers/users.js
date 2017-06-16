@@ -19,9 +19,11 @@ exports.createuser = (req,res) => {
 
 // Function to find by id User
 exports.userid = (req,res) => {
-
-   frankify.findById(User,req.params.id,res);
-
+	if(req.params.id == null){
+		res.status(200).json({})
+	}else{
+		frankify.findById(User,req.params.id,res);
+	}
 }
 // function findOne
 exports.one = (req,res) => {
@@ -115,7 +117,8 @@ exports.totalCard = (req,res) => {
 			return res.status(200).json({
 				status: "success", 
 				message: "ok",
-				total: format(totals)
+				total: format(totals),
+				totalG: totals
 			})
 		}
 	})
@@ -194,8 +197,8 @@ exports.recover = (req,res) => {
 									<p>sus datos de acceso para ingresar a nuestro sitio son:</p>
 									<br>
 									<br>
-									<h2>Correo: <b>${response.mail}</b></h2>
-									<h2>Password: <b>${response.password}</b></h2>
+									<h4>Correo: <b>${response.mail}</b></h4>
+									<h4>Password: <b>${response.password}</b></h4>
 									<br>
 									<br>
 									<br>
