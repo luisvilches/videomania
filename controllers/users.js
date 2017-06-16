@@ -1,6 +1,7 @@
 const frankify = require('../frankify')
 const NodeMailer = require('nodemailer');
 const User = require('.././models/user')
+const smtpTransport = require('nodemailer-smtp-transport');
 
 // Function to show all Users
 exports.users = (req,res) => {
@@ -215,7 +216,7 @@ exports.recover = (req,res) => {
 				html: template
 			};
 
-			let smtpConfig = {
+			/*let smtpConfig = {
 				host: 'mail.dowhile.cl',
 				port: 587,
 				tls: {
@@ -226,9 +227,17 @@ exports.recover = (req,res) => {
 					user: 'info@dowhile.cl',
 					pass: 'd0wh1l3' 
 				}
-			};
+			};*/
 
-			let transporter = NodeMailer.createTransport(smtpConfig);
+			//let transporter = NodeMailer.createTransport(smtpConfig);
+
+			let transporter = NodeMailer.createTransport(smtpTransport({
+				service: 'gmail',
+				auth: {
+					user: 'no.reply.videomanias@gmail.com',
+					pass: 'videomanias2017'
+				}
+			}));
 
 			transporter.sendMail(mailOptions, function(error, info){
 			if (error){

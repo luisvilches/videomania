@@ -22,6 +22,7 @@
     "mongoose": "^4.9.5",
     "mongoose-simple-random": "^0.4.1",
     "nodemailer": "^4.0.1",
+    "nodemailer-smtp-transport": "^2.7.4",
     "webpay-nodejs": "^0.1.6"
   }
 }
