@@ -21,14 +21,6 @@ let User = new Schema({
 	my_shopping:[
 		{
 			transaction: String,
-			items: [
-				{
-					cant: Number,
-					sku: String,
-					item: String,
-					price: Number
-				}
-			],
 			total: Number,
 			Date: Date
 		}

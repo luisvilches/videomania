@@ -35,6 +35,7 @@ router.delete('/gender/:id', controller.gender.delete)
 // productos
 
 router.get('/product', controller.product.find)
+router.get('/datoscomercio/:token', controller.product.datosCompra)
 router.post('/transaccion', controller.product.transaccion)
 router.post('/verificar', controller.product.verificar)
 router.post('/comprobante', controller.product.comprobante)

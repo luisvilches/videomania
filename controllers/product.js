@@ -1,5 +1,7 @@
 const cloudinary = require('cloudinary')
 const Model = require('.././models/product');
+const Transaction = require('.././models/transaccion');
+const User = require('.././models/user')
 const WebPay = require('webpay-nodejs');
 const fs = require('fs');
 const path = require('path');
@@ -557,21 +559,29 @@ exports.search = (req,res) => {
 
 exports.transaccion = (req,res) => {
 
-    let buyOrden = Date.now();
+    var num = [];
+    for(var i = 0; i <= 102458; i++){
+        num.push(i);
+    }
+    var indice = Math.floor(Math.random()*num.length);
+    var number = num[indice];
+    
+
+    let buyOrden = num.splice(indice, 1);//Date.now();
+    let user = req.body.user;
     let amount = req.body.amount;
     transactions[buyOrden] = { amount: amount};
     let url = 'http://' + req.get('host');
 
+
     wp.initTransaction({
         buyOrder: buyOrden,
-        sessionId: req.sessionId,
+        sessionId: req.body.user,
         returnURL: url + '/verificar',
         finalURL: url + '/comprobante',
         amount: amount
     }).then((data) => {
-        //res.redirect(data.url + '?token_ws=' + data.token);
         res.status(200).json({url: data.url + '?token_ws=' + data.token})
-        console.log(data.url + '?token_ws=' + data.token)
     })
 }
 
@@ -579,15 +589,15 @@ exports.verificar = (req,res) => {
     let token = req.body.token_ws;
     let transaction;
 
-    console.log('pre token', token);
+    //console.log('pre token', token);
 
     wp.getTransactionResult(token).then((transactionResult) => {
         transaction = transactionResult;
        transactions[transaction.buyOrder] = transaction;
 
-        console.log('transaction', transaction);
+        //console.log('transaction', transaction);
        
-        console.log('re acknowledgeTransaction', token)
+        //console.log('re acknowledgeTransaction', token)
        return wp.acknowledgeTransaction(token);
 
     }).then((result2) => {
@@ -595,10 +605,63 @@ exports.verificar = (req,res) => {
         // Si llegas aquí, entonces la transacción fue confirmada.
         // Este es un buen momento para guardar la información y actualizar tus registros (disminuir stock, etc).
 
-        res.send(WebPay.getHtmlTransitionPage(transaction.urlRedirection, token));
+        let order = new Transaction({
+            date: transaction.transactionDate,
+            commerceCode:transaction.detailOutput[0].commerceCode,
+            buyOrder: transaction.buyOrder,
+            amount: transaction.detailOutput[0].amount,
+            authCode: transaction.detailOutput[0].authorizationCode,
+            clientId: transaction.sessionId,
+            token: token
+        })
+
+        order.save((err,response) => {
+            if(err){
+                console.log(err);
+            }else{
+                User.findByIdAndUpdate(transaction.sessionId,
+                    {$push: {"my_shopping": {
+                        transaction: transaction.buyOrder,
+                        total: transaction.detailOutput[0].amount,
+                        Date: transaction.transactionDate
+                    }}},
+                    {safe: true, upsert: true},
+                    function(err, response2) {
+                        if(err) {
+                            console.log(err)
+                        }
+                        else {
+                            return res.send(WebPay.getHtmlTransitionPage(transaction.urlRedirection, token));
+                            
+                        }
+                    }
+                );
+            }
+        })
     });
 }
 
 exports.comprobante = (req,res) => {
-    res.redirect('http://localhost:3000')
+    res.redirect(`http://localhost:3000/#/comprobante/cod/${req.body.token_ws}`)
+}
+
+exports.datosCompra = (req,res) => {
+    Transaction.findOne({token: req.params.token},(err,response) => {
+        if(err){
+            console.log(err);
+        }else{
+            //console.log(response)
+           // res.status(200).json(response)
+            User.findById({_id: response.clientId},(err,result) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    return res.status(200).json({
+                        client: result,
+                        commerce: response
+                    })
+                }
+            })
+        }
+    })
 }

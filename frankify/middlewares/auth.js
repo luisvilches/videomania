@@ -16,6 +16,6 @@ exports.ensureAuthenticated = (req,res,next) => {
 
     req.user = payload.sub;
     req.username = payload.username;
-    console.log(`user: ${req.username} ID: ${req.user}`)
+    //console.log(`user: ${req.username} ID: ${req.user}`)
     next()
 }

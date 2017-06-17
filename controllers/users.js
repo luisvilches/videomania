@@ -110,9 +110,9 @@ exports.totalCard = (req,res) => {
 			var totals = 0;
 			for(var i = 0; i < response.cart.length; i++){
 				var product = response.cart[i];
-				console.log(product)
+				//console.log(product)
 				totals += (product.price * product.cant);
-				console.log(totals)
+				//console.log(totals)
 			}
 
 			return res.status(200).json({
