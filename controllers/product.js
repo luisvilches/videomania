@@ -684,6 +684,9 @@ exports.comprobante = (req,res) => {
                                 console.log(details.items)
                                 ordenCompra(response.buyOrder,response.authCode,response.clientId,response.amount,details.items);
                                 correoCliente(result.name,result.mail,response.buyOrder,response.authCode,response.amount,details.items);
+                                User.update({_id: response.clientId},{ $set: { cart: [] }},(err,carts) => {
+                                    console.log(response.clientId, carts);
+                                })
                             }
                         })
                     },5000);
@@ -741,7 +744,7 @@ function correoCliente(usuario,mail,comercio,auth,total,arr){
         return `<tr>
             <td style="height: 36px;"><p style="color:#000080; font-size:14px; font-weight:200;">${item.item}</p></td>
             <td style="text-align: center; font-size:14px; font-weight:200; height: 36px;">${item.cant}</td>
-            <td style="text-align: right; font-size:14px; font-weight:200; height: 36px;">${item.price}</td>
+            <td style="text-align: right; font-size:14px; font-weight:200; height: 36px;">$${item.price}</td>
         </tr>`
     }).join('');
 
@@ -878,7 +881,7 @@ function correoCliente(usuario,mail,comercio,auth,total,arr){
                         </tr>
                         <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                             <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
-                            <b>Gracias de parte de todo el equipo de Videomanias.cl</b>
+                            <b>Gracias por su compra de parte de todo el equipo de Videomanias.cl</b>
                             </td>
                         </tr>
                         </table>
