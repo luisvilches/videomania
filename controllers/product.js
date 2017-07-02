@@ -11,6 +11,8 @@ const webpaykey = require('.././keys/webpaykey');
 const NodeMailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
 
+const Url = 'http://videomania.dowhile.cl';
+
 const wp = new WebPay({
     commerceCode: '597020000541',
     publicKey: public,
@@ -652,7 +654,7 @@ exports.comprobante = (req,res) => {
                 if(err){
                     console.log(err)
                 }else if(response.authCode === "000000"){
-                    res.redirect(`http://localhost:3000`);
+                    res.redirect(Url);
                 }else{
                     var arr = [];
                     result.cart.map((item,index) => {
@@ -686,9 +688,9 @@ exports.comprobante = (req,res) => {
                         })
                     },5000);
                     if(!req.body.token_ws == 'undefined' || req.body.token_ws == '' || req.body.token_ws == null){
-                        res.redirect(`http://localhost:3000`);
+                        res.redirect(Url);
                     }else{
-                        res.redirect(`http://localhost:3000/#/comprobante/cod/${req.body.token_ws}`);
+                        res.redirect(`${Url}/#/comprobante/cod/${req.body.token_ws}`);
                     }
                 }
             })
