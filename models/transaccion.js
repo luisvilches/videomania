@@ -8,6 +8,14 @@ let Transaccion = new Schema({
     amount: String,
     authCode: String,
     clientId: String,
+    items: [
+        {
+			cant: Number,
+			sku: String,
+			item: String,
+			price: Number
+		}
+    ],
     token: String
 })
 

@@ -8,6 +8,8 @@ const path = require('path');
 const public = require('.././keys/public');
 const private = require('.././keys/private');
 const webpaykey = require('.././keys/webpaykey');
+const NodeMailer = require('nodemailer');
+const smtpTransport = require('nodemailer-smtp-transport');
 
 const wp = new WebPay({
     commerceCode: '597020000541',
@@ -642,7 +644,56 @@ exports.verificar = (req,res) => {
 }
 
 exports.comprobante = (req,res) => {
-    res.redirect(`http://localhost:3000/#/comprobante/cod/${req.body.token_ws}`)
+    Transaction.findOne({token: req.body.token_ws},(err,response) => {
+        if(err){
+            console.log(err);
+        }else{
+            User.findById({_id: response.clientId},(err,result) => {
+                if(err){
+                    console.log(err)
+                }else if(response.authCode === "000000"){
+                    res.redirect(`http://localhost:3000`);
+                }else{
+                    var arr = [];
+                    result.cart.map((item,index) => {
+                        Transaction.findByIdAndUpdate(response._id,
+                            {$push: {"items": {
+                                cant: item.cant,
+                                sku: item.sku ,
+                                item: item.item,
+                                price: item.price
+                            }}},
+                            {safe: true, upsert: true},
+                            function(err, res) {
+                                if(err) {
+                                    console.log(err)
+                                }
+                                else {
+                                    console.log('ok ' + index);
+                                    
+                                }
+                            }
+                        );
+                    });
+                    setTimeout(function(){
+                        Transaction.findOne({token: req.body.token_ws},(errorr,details) => {
+                            if(errorr) {console.log(errorr)}
+                            else{
+                                console.log(details.items)
+                                ordenCompra(response.buyOrder,response.authCode,response.clientId,response.amount,details.items);
+                                correoCliente(result.name,result.mail,response.buyOrder,response.authCode,response.amount,details.items);
+                            }
+                        })
+                    },5000);
+                    if(!req.body.token_ws == 'undefined' || req.body.token_ws == '' || req.body.token_ws == null){
+                        res.redirect(`http://localhost:3000`);
+                    }else{
+                        res.redirect(`http://localhost:3000/#/comprobante/cod/${req.body.token_ws}`);
+                    }
+                }
+            })
+        }
+    })
 }
 
 exports.datosCompra = (req,res) => {
@@ -650,8 +701,6 @@ exports.datosCompra = (req,res) => {
         if(err){
             console.log(err);
         }else{
-            //console.log(response)
-           // res.status(200).json(response)
             User.findById({_id: response.clientId},(err,result) => {
                 if(err){
                     console.log(err)
@@ -664,4 +713,270 @@ exports.datosCompra = (req,res) => {
             })
         }
     })
+}
+
+exports.transacciones = (req,res) => {
+    Transaction.find((err,response) => {
+        if(err){
+            console.log('transaction error: '+err)
+            return res.status(500).json({
+                state: 'error',
+                message: err,
+                data: []
+            })
+        }else{
+            return res.status(200).json({
+                state: 'success',
+                message: 'Operacion realizada con exito',
+                data: response
+            })
+        }
+    })
+}
+
+function correoCliente(usuario,mail,comercio,auth,total,arr){
+    var details = arr.map((item) => {
+        return `<tr>
+            <td style="height: 36px;"><p style="color:#000080; font-size:14px; font-weight:200;">${item.item}</p></td>
+            <td style="text-align: center; font-size:14px; font-weight:200; height: 36px;">${item.cant}</td>
+            <td style="text-align: right; font-size:14px; font-weight:200; height: 36px;">${item.price}</td>
+        </tr>`
+    }).join('');
+
+    let template = `
+        <!--DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" -->
+        <html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+
+        <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Alerts e.g. approaching your limit</title>
+
+
+        <style type="text/css">
+            img {
+            max-width: 100%;
+            }
+            body {
+            -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em;
+            }
+            body {
+            background-color: #f6f6f6;
+            }
+            @media only screen and (max-width: 640px) {
+            body {
+                padding: 0 !important;
+            }
+            h1 {
+                font-weight: 800 !important; margin: 20px 0 5px !important;
+            }
+            h2 {
+                font-weight: 800 !important; margin: 20px 0 5px !important;
+            }
+            h3 {
+                font-weight: 800 !important; margin: 20px 0 5px !important;
+            }
+            h4 {
+                font-weight: 800 !important; margin: 20px 0 5px !important;
+            }
+            h1 {
+                font-size: 22px !important;
+            }
+            h2 {
+                font-size: 18px !important;
+            }
+            h3 {
+                font-size: 16px !important;
+            }
+            .container {
+                padding: 0 !important; width: 100% !important;
+            }
+            .content {
+                padding: 0 !important;
+            }
+            .content-wrap {
+                padding: 10px !important;
+            }
+            .invoice {
+                width: 100% !important;
+            }
+            }
+        </style>
+        </head>
+
+        <body itemscope itemtype="http://schema.org/EmailMessage" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #f6f6f6; margin: 0;"
+        bgcolor="#f6f6f6">
+
+        <table class="body-wrap" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #f6f6f6; margin: 0;" bgcolor="#f6f6f6">
+            <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+            <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+            <td class="container" width="600" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;"
+            valign="top">
+                <div class="content" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
+                <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px solid #e9e9e9;"
+                bgcolor="#fff">
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="alert alert-warning" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 16px; vertical-align: top; color: #fff; font-weight: 500; text-align: center; border-radius: 3px 3px 0 0; background-color: #E41F2C; margin: 0; padding: 20px;"
+                    align="center" bgcolor="#FF9F00" valign="top">
+                        <img src="http://oi67.tinypic.com/246wehw.jpg" />
+                    </td>
+                    </tr>
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <td class="content-wrap" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 20px;" valign="top">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            Estimado/a <strong style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">${usuario}</strong>.
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <b>Gracias por su compra</b>
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            Nos pondremos en contacto con usted nuevamente cuando enviemos su(s) producto(s), la fecha estimada se indica a continuación.
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <b>Fecha de entrega:</b> 3 a 7 días habiles.
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <b>Codigo de transacción:</b> ${comercio}
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <b>Codigo de autorización:</b> ${auth}
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <b>Detalle de productos:</b><br/>
+                                <table cellspacing="0" style=" width: 100%; margin-top: 15px; padding: 10px; border-radius: 4px; overflow: hidden;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="padding: 0 0 5px 0; width:40%; border-bottom: 1px solid #ccc; font-weight: 600; height: 36px;">Producto</td>
+                                            <td style="padding: 0 0 5px 0; width:15%; border-bottom: 1px solid #ccc; text-align: center; font-weight: 600; height: 36px;">Cant</td>
+                                            <td style="padding: 0 0 5px 0; width:15%; border-bottom: 1px solid #ccc; text-align: right; font-weight: 600; height: 36px;">Precio</td>
+                                        </tr>
+                                        ${details}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <h2><b>Total de la compra:</b> $${total}</h2>
+                            </td>
+                        </tr>
+                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                            <b>Gracias de parte de todo el equipo de Videomanias.cl</b>
+                            </td>
+                        </tr>
+                        </table>
+                    </td>
+                    </tr>
+                </table>
+                <div class="footer" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; clear: both; color: #999; margin: 0; padding: 20px;">
+                    <table width="100%" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                        <td class="aligncenter content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; vertical-align: top; color: #999; text-align: center; margin: 0; padding: 0 0 20px;" align="center"
+                        valign="top">
+                        Copyright 2017 - <a href="http://www.videomanias.cl" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 12px; color: #999; text-decoration: underline; margin: 0;">videomanias.cl</a>. Todos los derechos reservados.</td>
+                    </tr>
+                    </table>
+                </div>
+                </div>
+            </td>
+            <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+            </tr>
+        </table>
+        </body>
+        </html>
+    `
+
+    let mailOptions = {
+        from: 'Videomanias.cl',
+        to: mail,
+        subject: 'Confirmacion compra Videomanias.cl',
+        html: template
+    };
+
+    let transporter = NodeMailer.createTransport(smtpTransport({
+        service: 'gmail',
+        auth: {
+            user: 'no.reply.videomanias@gmail.com',
+            pass: 'videomanias2017'
+        }
+    }));
+
+    transporter.sendMail(mailOptions, function(error, info){
+    if (error){
+        console.log(error);
+    } else {
+        console.log("Email sent");
+    }})
+}
+
+function ordenCompra(comercio,auth,cliente,total,arr){
+   var details = arr.map((item) => {
+        return `<tr>
+            <td style="height: 36px;"><p style="color:#000080; font-size:14px; font-weight:200;">${item.item}</p></td>
+            <td style="text-align: center; font-size:14px; font-weight:200; height: 36px;">${item.cant}</td>
+            <td style="text-align: right; font-size:14px; font-weight:200; height: 36px;">${item.price}</td>
+        </tr>`
+    }).join('');
+
+    var template = `<section>
+            <br><h3>Estimado administrador</h3><br>
+            <p>Una nueva transacción de compra fue relializada desde su portal Videomanias.cl</p>
+            <br>
+            <h4>Codigo de transacción: <b>${comercio}</b></h4>
+            <h4>Codigo de autorización: <b>${auth}</b></h4>
+            <h4>Codigo de cliente: <b>${cliente}</b></h4>
+            <br/>
+            <h2>Productos:</h2>
+            <table cellspacing="0" style=" width: 100%; margin-top: 15px; padding: 10px; border-radius: 4px; overflow: hidden;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 0 0 5px 0; width:40%; border-bottom: 1px solid #ccc; font-weight: 600; height: 36px;">Producto</td>
+                        <td style="padding: 0 0 5px 0; width:15%; border-bottom: 1px solid #ccc; text-align: center; font-weight: 600; height: 36px;">Cant</td>
+                        <td style="padding: 0 0 5px 0; width:15%; border-bottom: 1px solid #ccc; text-align: right; font-weight: 600; height: 36px;">Precio</td>
+                    </tr>
+                    ${details}
+                </tbody>
+            </table>
+        <br>
+        <h2>Monto total: <b>$${total}</b></h2>
+        <br>
+        <h3><b>Atte. Videomanias.cl</b></h3>
+    </section>`;
+
+    let mailOptions = {
+        from: 'Videomanias.cl',
+        to: 'luis@dowhile.cl',
+        subject: 'Nueva transacción desde Videomanias.cl',
+        html: template
+    };
+
+    let transporter = NodeMailer.createTransport(smtpTransport({
+        service: 'gmail',
+        auth: {
+            user: 'no.reply.videomanias@gmail.com',
+            pass: 'videomanias2017'
+        }
+    }));
+
+    transporter.sendMail(mailOptions, function(error, info){
+    if (error){
+        console.log(error);
+    } else {
+        console.log("Email sent");
+    }})
 }
