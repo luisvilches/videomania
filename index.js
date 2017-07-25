@@ -16,9 +16,9 @@ frankify.upload();
 
 // config cloudinary
 cloudinary.config({ 
-  cloud_name: 'dowhile', 
-  api_key: '379999323567133', 
-  api_secret: 'SJ_2PkWm2ISda-R2gDE5KdJR3J4' 
+  cloud_name: 'dbdsxkhtp', 
+  api_key: '722923292138612', 
+  api_secret: 'h1cwtjEXDkPWZzwQCOZVG2wpnOw' 
 });
 
 //config body-parser
