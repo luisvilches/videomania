@@ -690,7 +690,7 @@ exports.comprobante = (req,res) => {
                             }
                         })
                     },5000);
-                    if(!req.body.token_ws == 'undefined' || req.body.token_ws == '' || req.body.token_ws == null){
+                    if(req.body.token_ws == 'undefined' || req.body.token_ws == '' || req.body.token_ws == null){
                         res.redirect(Url);
                     }else{
                         res.redirect(`${Url}/#/comprobante/cod/${req.body.token_ws}`);
