@@ -11,7 +11,7 @@ const webpaykey = require('.././keys/webpaykey');
 const NodeMailer = require('nodemailer');
 const smtpTransport = require('nodemailer-smtp-transport');
 
-const Url = 'http://www.videomania.cl';
+const Url = 'http://www.videomanias.cl';
 
 const wp = new WebPay({
     commerceCode: '597020000541',
