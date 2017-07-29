@@ -16,9 +16,9 @@ frankify.upload();
 
 // config cloudinary
 cloudinary.config({ 
-  cloud_name: 'dbdsxkhtp', 
-  api_key: '722923292138612', 
-  api_secret: 'h1cwtjEXDkPWZzwQCOZVG2wpnOw' 
+  cloud_name: 'videomania', 
+  api_key: '657435549659421', 
+  api_secret: 'e4ZqzgRS38uPyfYT8CJWirELzpo' 
 });
 
 //config body-parser
