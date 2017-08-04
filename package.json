@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index"
+    "start2": "node index",
+    "start": "node ./node_modules/.bin/pm2 start index.js -i max --attach"
   },
   "author": " ",
   "license": "MIT",
@@ -23,6 +24,7 @@
     "mongoose-simple-random": "^0.4.1",
     "nodemailer": "^4.0.1",
     "nodemailer-smtp-transport": "^2.7.4",
+    "pm2": "^2.6.1",
     "webpay-nodejs": "^0.1.6"
   }
 }

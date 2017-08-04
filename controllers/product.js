@@ -646,59 +646,64 @@ exports.verificar = (req,res) => {
 }
 
 exports.comprobante = (req,res) => {
-    Transaction.findOne({token: req.body.token_ws},(err,response) => {
-        if(err){
-            console.log(err);
-        }else{
-            User.findById({_id: response.clientId},(err,result) => {
-                if(err){
-                    console.log(err)
-                }else if(response.authCode === "000000"){
-                    res.redirect(Url);
-                }else{
-                    var arr = [];
-                    result.cart.map((item,index) => {
-                        Transaction.findByIdAndUpdate(response._id,
-                            {$push: {"items": {
-                                cant: item.cant,
-                                sku: item.sku ,
-                                item: item.item,
-                                price: item.price
-                            }}},
-                            {safe: true, upsert: true},
-                            function(err, res) {
-                                if(err) {
-                                    console.log(err)
-                                }
-                                else {
-                                    console.log('ok ' + index);
-                                    
-                                }
-                            }
-                        );
-                    });
-                    setTimeout(function(){
-                        Transaction.findOne({token: req.body.token_ws},(errorr,details) => {
-                            if(errorr) {console.log(errorr)}
-                            else{
-                                console.log(details.items)
-                                ordenCompra(response.buyOrder,response.authCode,response.clientId,response.amount,details.items);
-                                correoCliente(result.name,result.mail,response.buyOrder,response.authCode,response.amount,details.items);
-                                User.update({_id: response.clientId},{ $set: { cart: [] }},(err,carts) => {
-                                    console.log(response.clientId, carts);
-                                })
-                            }
-                        })
-                    },5000);
-                    if(req.body.token_ws == 'undefined' || req.body.token_ws == '' || req.body.token_ws == null){
-                        res.redirect(Url);
+    if(req.body.token_ws === "" || req.body.token_ws === "undefined" || req.body.token_ws == null || req.body.token_ws === 0){
+        res.redirect(`${Url}/#/error/cod/rechazado`);
+    }else{
+        Transaction.findOne({token: req.body.token_ws},(err,response) => {
+            if(err){
+                console.log(err);
+            } else {
+                console.log(req.body.token_ws)
+                User.findById({_id: response.clientId},(err,result) => {
+                    if(err){
+                        console.log(err)
+                    }else if(response.authCode === "000000"){
+                        res.redirect(`${Url}/#/error/cod/rechazado`);
                     }else{
-                        res.redirect(`${Url}/#/comprobante/cod/${req.body.token_ws}`);
+                        var arr = [];
+                        result.cart.map((item,index) => {
+                            Transaction.findByIdAndUpdate(response._id,
+                                {$push: {"items": {
+                                    cant: item.cant,
+                                    sku: item.sku ,
+                                    item: item.item,
+                                    price: item.price
+                                }}},
+                                {safe: true, upsert: true},
+                                function(err, res) {
+                                    if(err) {
+                                        console.log(err)
+                                    }
+                                    else {
+                                        console.log('ok ' + index);
+                                        
+                                    }
+                                }
+                            );
+                        });
+                        setTimeout(function(){
+                            Transaction.findOne({token: req.body.token_ws},(errorr,details) => {
+                                if(errorr) {console.log(errorr)}
+                                else{
+                                    //console.log(details.items)
+                                    ordenCompra(response.buyOrder,response.authCode,response.clientId,response.amount,details.items);
+                                    correoCliente(result.name,result.mail,response.buyOrder,response.authCode,response.amount,details.items);
+                                    User.update({_id: response.clientId},{ $set: { cart: [] }},(err,carts) => {
+                                        console.log(response.clientId, carts);
+                                    })
+                                }
+                            })
+                        },5000);
+                        if(req.body.token_ws == 'undefined' || req.body.token_ws == '' || req.body.token_ws == null){
+                            res.redirect(`${Url}/#/error/cod/rechazado`);
+                        }else{
+                            res.redirect(`${Url}/#/comprobante/cod/${req.body.token_ws}`);
+                        }
                     }
-                }
-            })
-        }
-    })
+                })
+            }
+        })
+    }
 }
 
 exports.datosCompra = (req,res) => {
